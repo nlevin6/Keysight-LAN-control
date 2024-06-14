@@ -1,6 +1,10 @@
 import pyvisa
 import tkinter as tk
 from tkinter import messagebox
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
+
 
 class FunctionGeneratorApp:
     def __init__(self, master):
@@ -10,7 +14,7 @@ class FunctionGeneratorApp:
         self.rm = None
         self.instrument = None
 
-        # init output button
+        # init output buttons
         self.output_button = tk.Button(master, text="Output ON", command=self.toggle_output)
         self.output_button.pack()
 
@@ -26,17 +30,20 @@ class FunctionGeneratorApp:
         self.square_button = tk.Button(master, text="Square Wave", command=lambda: self.set_func('SQU'))
         self.square_button.pack()
 
-        self.square_button = tk.Button(master, text="Pulse Wave", command=lambda: self.set_func('PULS'))
-        self.square_button.pack()
+        self.ramp_button = tk.Button(master, text="Ramp Wave", command=lambda: self.set_func('RAMP'))
+        self.ramp_button.pack()
+        
+        self.pulse_button = tk.Button(master, text="Pulse Wave", command=lambda: self.set_func('PULS'))
+        self.pulse_button.pack()
 
-        self.square_button = tk.Button(master, text="Ramp Wave", command=lambda: self.set_func('RAMP'))
-        self.square_button.pack()
-
-        self.square_button = tk.Button(master, text="Noise Wave", command=lambda: self.set_func('NOIS'))
-        self.square_button.pack()
+        self.noise_button = tk.Button(master, text="Noise Wave", command=lambda: self.set_func('NOIS'))
+        self.noise_button.pack()
 
         self.func_status = tk.Label(master, text="Current Waveform: DC")
         self.func_status.pack()
+
+        self.plot_button = tk.Button(master, text="Plot", command=self.plot_graph)
+        self.plot_button.pack()
 
         #connect to the keysight instrument
         self.keysight_connect()
@@ -105,6 +112,22 @@ class FunctionGeneratorApp:
                 self.output_status.config(text="Output status: ON")
         except Exception as e:
             messagebox.showerror("Error", str(e))
+    
+    def plot_graph(self):
+        # Create a simple sine wave plot
+        fig = Figure(figsize=(5, 4), dpi=100)
+        t = [i * 0.01 for i in range(100)]
+        y = [2 * np.sin(2 * np.pi * 1 * i) for i in t]
+
+        plot = fig.add_subplot(111)
+        plot.plot(t, y)
+        plot.set_title("Sine Wave Plot")
+        plot.set_xlabel("Time (s)")
+        plot.set_ylabel("Amplitude (V)")
+
+        canvas = FigureCanvasTkAgg(fig, master=self.master)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
 
     def close(self):
         if self.instrument:
@@ -115,7 +138,7 @@ def main():
     root = tk.Tk()
     app = FunctionGeneratorApp(root)
     root.protocol("WM_DELETE_WINDOW", app.close)
-    root.geometry('520x300')
+    root.geometry('520x500')
     root.mainloop()
 
 if __name__ == "__main__":
