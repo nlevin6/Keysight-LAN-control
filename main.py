@@ -4,7 +4,7 @@ def main():
     # print("Available VISA backends:", pyvisa.highlevel.list_backends())
 
     # Initialize VISA resource manager
-    rm = pyvisa.ResourceManager('@py')
+    rm = pyvisa.ResourceManager('@py') # this actually uses the pyvisa_py library
 
     # Replace 'TCPIP0::192.168.1.100::INSTR' with the actual IP address of your Keysight 33210A
     instrument_address = 'TCPIP0::169.254.2.20::INSTR'
@@ -17,14 +17,17 @@ def main():
         idn = instrument.query('*IDN?')
         print(f"Connected to: {idn}")
 
-        # Set the waveform to a sine wave with a freq of 1kHz and amplitude of 2V
-        instrument.write('FUNC SIN')
-        instrument.write('FREQ 1KHZ')
-        instrument.write('VOLT 2')
+        instrument.write('OUTP ON') # turn on the output button, set to OFF if you want it off
+        instrument.write('FUNC SIN') # SIN wave
+        instrument.write('FREQ 3KHZ') # frequency
+        instrument.write('VOLT 4') # voltage amplitude
+        
 
         # Query the current waveform settings
         frequency = instrument.query('FREQ?')
         amplitude = instrument.query('VOLT?')
+        output_status = instrument.query('OUTP?')
+        print(f"Output status: {'ON' if output_status.strip() == '1' else 'OFF'}")
         print(f"Waveform set to sine with frequency {frequency.strip()} and amplitude {amplitude.strip()} V")
 
         # Close the connection
