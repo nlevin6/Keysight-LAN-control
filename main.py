@@ -14,7 +14,6 @@ class FunctionGeneratorApp:
         self.rm = None
         self.instrument = None
 
-        # init output buttons
         self.output_button = tk.Button(master, text="Output ON", command=self.toggle_output)
         self.output_button.pack()
 
@@ -44,8 +43,6 @@ class FunctionGeneratorApp:
 
         self.plot_button = tk.Button(master, text="Plot", command=self.plot_graph)
         self.plot_button.pack()
-
-        #connect to the keysight instrument
         self.keysight_connect()
 
     def keysight_connect(self):
@@ -57,14 +54,12 @@ class FunctionGeneratorApp:
             idn = self.instrument.query('*IDN?')
             messagebox.showinfo("Connection Status", f"Connected to: {idn}")
             
-            # Initialize the function generator
-            self.instrument.write('*RST') # reset instrument to default settings
-            self.instrument.write('*CLS') # clear the status registers
+            self.instrument.write('*RST')
+            self.instrument.write('*CLS')
             
-            #default settings when initilized
             self.instrument.write('FUNC DC')
             self.instrument.write('FREQ 4KHZ')
-            self.instrument.write('VOLT:OFFS 1')  # Set the offset voltage to 1V
+            self.instrument.write('VOLT:OFFS 1') 
 
         except Exception as e:
             messagebox.showerror("Connection Error", str(e))
@@ -73,11 +68,11 @@ class FunctionGeneratorApp:
         try:
             if func_type == 'SIN':
                 self.instrument.write('FUNC SIN')
-                self.instrument.write('FREQ 1KHZ')  # Set frequency for SIN wave
-                self.instrument.write('VOLT 2')     # Set amplitude for SIN wave
+                self.instrument.write('FREQ 1KHZ')
+                self.instrument.write('VOLT 2')
             elif func_type == 'DC':
                 self.instrument.write('FUNC DC')
-                self.instrument.write('VOLT:OFFS 1')  # Set the offset voltage to 1V for DC
+                self.instrument.write('VOLT:OFFS 1')
             elif func_type == 'SQU':
                 self.instrument.write('FUNC SQU')
                 self.instrument.write('FREQ 1KHZ') 
@@ -113,8 +108,7 @@ class FunctionGeneratorApp:
         except Exception as e:
             messagebox.showerror("Error", str(e))
     
-    def plot_graph(self):
-        # Create a simple sine wave plot
+    def plot_graph(self): # placeholder sin graph
         fig = Figure(figsize=(5, 4), dpi=100)
         t = [i * 0.01 for i in range(100)]
         y = [2 * np.sin(2 * np.pi * 1 * i) for i in t]
